@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "keyboardNavigation", "keyboardNavigation\keyboardNavigation.vbproj", "{F748CBD3-3933-4F11-A027-31F688032F21}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F748CBD3-3933-4F11-A027-31F688032F21}.Debug|x86.ActiveCfg = Debug|x86
+		{F748CBD3-3933-4F11-A027-31F688032F21}.Debug|x86.Build.0 = Debug|x86
+		{F748CBD3-3933-4F11-A027-31F688032F21}.Release|x86.ActiveCfg = Release|x86
+		{F748CBD3-3933-4F11-A027-31F688032F21}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

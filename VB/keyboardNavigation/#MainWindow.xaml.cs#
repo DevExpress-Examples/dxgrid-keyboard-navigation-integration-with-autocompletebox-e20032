@@ -1,0 +1,129 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using DevExpress.Xpf.Grid;
+using DevExpress.Xpf.Core.Native;
+using System.Windows.Threading;
+using System.Net;
+using System.Windows.Interactivity;
+
+namespace keyboardNavigation {
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window {
+        public MainWindow() {
+            InitializeComponent();
+            gridControl1.ItemsSource = TestDataList.Create();
+        }
+
+        private void KeyboardNavigationBehavior_FocusEditor(object sender, FocusEditorEventArgs e) {
+            AutoCompleteBox ed = (AutoCompleteBox)e.Editor;
+            TextBox mainEditor = ed.Template.FindName("Text", ed) as TextBox;
+            mainEditor.Focus();
+        }
+
+        private void KeyboardNavigationBehavior_FocusEditor_1(object sender, FocusEditorEventArgs e) {
+            Slider sl = (Slider)e.Editor;
+            sl.Focus();
+        }
+    }
+    public class TestDataList : List<TestDataItem> {
+        public static TestDataList Create() {
+            TestDataList res = new TestDataList();
+            for (int i = 0; i < 2; i++) {
+                TestDataItem item = new TestDataItem();
+                item.ID = i;
+                item.Value = "AA";
+                item.Value2 = 2;
+                res.Add(item);
+            }
+            for (int i = 0; i < 2; i++) {
+                TestDataItem item = new TestDataItem();
+                item.ID = i;
+                item.Value = "AB";
+                item.Value2 = 3;
+                res.Add(item);
+            }
+            for (int i = 0; i < 2; i++) {
+                TestDataItem item = new TestDataItem();
+                item.ID = i;
+                item.Value = "AAA";
+                item.Value2 = 5;
+                res.Add(item);
+            }
+            for (int i = 0; i < 2; i++) {
+                TestDataItem item = new TestDataItem();
+                item.ID = i;
+                item.Value = "ABA";
+                item.Value2 = 8;
+                res.Add(item);
+            }
+            return res;
+        }
+    }
+    public class TestDataItem {
+        public static List<string> Domain { set; get; }
+        public int ID { get; set; }
+        private string value;
+
+        public string Value {
+            get {
+                return this.value;
+            }
+            set 
+            {
+            	this.value = value;
+                if (Domain == null)
+                    Domain = new List<string> { this.value};
+                if (Domain != null && !(Domain.Contains(value))) {
+                    Domain.Add(this.value);
+                }
+            } 
+        }
+
+        public double Value2 { get; set; }
+    }
+    
+    public class KeyboardNavigationBehavior : Behavior<TableView> {
+        public static readonly DependencyProperty ColumnNameProperty =
+            DependencyProperty.Register("ColumnName", typeof(string), typeof(KeyboardNavigationBehavior), new PropertyMetadata(string.Empty));
+        public string ColumnName {
+            get { return (string)GetValue(ColumnNameProperty); }
+             set { SetValue(ColumnNameProperty, value); }
+        }
+        public TableView View { get { return AssociatedObject; } }
+        public event FocusEditorEventHandler FocusEditor;
+        protected override void OnAttached() {
+            base.OnAttached();
+            View.ShowingEditor += View_ShowingEditor;
+        }
+        protected override void OnDetaching() {
+            View.ShowingEditor -= View_ShowingEditor;
+            base.OnDetaching();
+        } 
+         void View_ShowingEditor(object sender, ShowingEditorEventArgs e) {
+            if (e.Column.Name != ColumnName) return;
+                GridCellContentPresenter cp = (GridCellContentPresenter)View.GetCellElementByRowHandleAndColumn(e.RowHandle, e.Column);
+            FrameworkElement editor = LayoutHelper.FindElementByName(cp, "PART_Editor");
+            if (FocusEditor != null) FocusEditor(this, new FocusEditorEventArgs(editor));
+        }
+    }
+    public delegate void FocusEditorEventHandler(object sender, FocusEditorEventArgs e);
+    public class FocusEditorEventArgs : EventArgs {
+        public FrameworkElement Editor { get; private set; }
+        public FocusEditorEventArgs(FrameworkElement editor) {
+            Editor = editor;
+        }
+    }
+}

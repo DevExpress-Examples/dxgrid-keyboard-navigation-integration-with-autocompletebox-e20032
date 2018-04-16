@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Windows.Interactivity;
+using DevExpress.Xpf.Grid;
+using DevExpress.Xpf.Core.Native;
+
+namespace attachedBehaviorPolicy {
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window {
+        public MainWindow() {
+            InitializeComponent();
+            gridControl1.ItemsSource = TestDataItems.Create();
+        }
+        private void FocusEditor_AutoComplete(object sender, FocusEditorEventArgs e) {
+            AutoCompleteBox a = (AutoCompleteBox)e.Editor;
+            TextBox mainEditor = a.Template.FindName("Text", a) as TextBox;
+            mainEditor.Focus();
+        }
+        private void FocusEditor_Slider(object sender, FocusEditorEventArgs e) {
+            e.Editor.Focus();
+        }
+    }
+    public class TestDataItems : List<TestDataItem> {
+        public static TestDataItems Create () {
+            TestDataItems t = new TestDataItems();
+            for (int i = 0; i < 50; i++) {
+                TestDataItem d = new TestDataItem {
+                    ID = i, 
+                    Value = (i % 5 / 4).ToString() + (i % 3 / 2).ToString() + (i % 2).ToString(), Value2= (i % 5 / 4) * 5 + (i % 3 / 2) * 3 + (i % 2) * 2};
+                t.Add(d);
+                if (TestDataItem.Domain == null) TestDataItem.Domain = new List<string>();
+                if (!TestDataItem.Domain.Contains(d.Value)) TestDataItem.Domain.Add(d.Value);
+            }
+            return t;
+        }
+    }
+    public class TestDataItem {
+        public static List<string> Domain { get; set; }
+        public string Value { get; set; }
+        public double Value2 { get; set; }
+        public int ID { get; set; }
+    }
+    internal class KeyboardNavigationBehavior : Behavior<TableView> {
+        public static readonly DependencyProperty ColumnNameProperty =
+            DependencyProperty.Register("ColumnName", typeof(string), typeof(KeyboardNavigationBehavior), new PropertyMetadata(string.Empty));
+        public string ColumnName {
+            get { return (string)GetValue(ColumnNameProperty); }
+            set { SetValue(ColumnNameProperty, value); }
+        }
+        public event FocusEditorEventHandler FocusEditor;
+        protected override void OnAttached() {
+            base.OnAttached();
+            AssociatedObject.ShowingEditor += OnShowingEditor;
+        }
+        protected override void OnDetaching() {
+            AssociatedObject.ShowingEditor -= OnShowingEditor;
+            base.OnDetaching();
+        }
+        public void OnShowingEditor(object o, ShowingEditorEventArgs e) {
+            if (e.Column.Name != ColumnName) return;
+            GridCellContentPresenter cp = (GridCellContentPresenter)AssociatedObject.GetCellElementByRowHandleAndColumn(e.RowHandle, e.Column);
+            FrameworkElement editor = LayoutHelper.FindElementByName(cp, "PART_Editor");
+            if (FocusEditor != null) FocusEditor(this, new FocusEditorEventArgs(editor));
+        }
+    }
+    public delegate void FocusEditorEventHandler(object s, FocusEditorEventArgs e);
+    public class FocusEditorEventArgs : EventArgs {
+        public FrameworkElement Editor { get; private set; }
+        public FocusEditorEventArgs(FrameworkElement editor) {
+            Editor = editor;
+        }
+    }
+}
