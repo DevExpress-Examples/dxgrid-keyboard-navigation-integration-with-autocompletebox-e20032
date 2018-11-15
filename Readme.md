@@ -1,3 +1,9 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [MainWindow.xaml](./CS/keyboardNavigation/MainWindow.xaml) (VB: [MainWindow.xaml.vb](./VB/keyboardNavigation/MainWindow.xaml.vb))
+* [MainWindow.xaml.cs](./CS/keyboardNavigation/MainWindow.xaml.cs) (VB: [MainWindow.xaml.vb](./VB/keyboardNavigation/MainWindow.xaml.vb))
+<!-- default file list end -->
 # DXGrid Keyboard Navigation integration with AutoCompleteBox
 
 
